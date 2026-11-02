@@ -1,0 +1,20 @@
+[project]
+name = "wingman"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Vaishalirajpal-28", email = "S4205552@student.rmit.edu.au" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.34.2",
+    "tavily-python>=0.8.5",
+]
+
+[project.scripts]
+wingman = "wingman:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
