@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import json
 
 # Make sure special characters (e.g. "─" or emojis in job text) print correctly on Windows
 sys.stdout.reconfigure(encoding="utf-8")
@@ -116,6 +117,19 @@ def search_jobs(query):
     print()  # blank line after the debug block
     return kept
 
+def save_jobs(jobs, filename="jobs.json"):
+    """Save the list of jobs to a JSON file."""
+    to_save = [
+        {
+            "title": job.get("title"),
+            "url": job.get("url"),
+            "description": job.get("raw_content"),
+        }
+        for job in jobs
+    ]
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(to_save, f, indent=2, ensure_ascii=False)
+    print(f"Saved {len(to_save)} jobs to {filename}")
 
 def main():
     query = input("What jobs are you looking for? ")
@@ -137,6 +151,7 @@ def main():
         print(f"{'─' * 60}")
         print(f"Description:\n{description[:400]}...")
         print(f"\nApply / View Job:\n{url}\n")
+    save_jobs(jobs)
 
 
 
