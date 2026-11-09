@@ -20,9 +20,16 @@ SCAN_JS = """() => {
         visible: el.offsetParent !== null,
         question: el.closest('fieldset') && el.closest('fieldset').querySelector('legend')
             ? el.closest('fieldset').querySelector('legend').innerText.trim()
-            : ''
+            : '',
+        role: el.getAttribute('role') || '',
+        popup: el.getAttribute('aria-haspopup') || ''
     }));
 }"""
+
+def is_required(f, text):
+    """Required if the form says so, or if the question text ends with a *."""
+    return bool(f["required"]) or text.rstrip().endswith("*")
+
 
 def group_fields(fields):
     """Turn the flat list of inputs into one entry per question."""
@@ -33,11 +40,23 @@ def group_fields(fields):
         if f["type"] in ("checkbox", "radio") and f["question"]:
             q = f["question"]
             if q not in groups:
-                groups[q] = {"question": q, "type": f["type"] + "_group", "options": []}
+                groups[q] = {
+                    "question": q,
+                    "tag": f["tag"],
+                    "type": f["type"] + "_group",
+                    "required": is_required(f, q),
+                    "options": [],
+                }
                 questions.append(groups[q])
             groups[q]["options"].append({"label": f["label"], "id": f["id"]})
         else:
-            questions.append({"question": f["label"], "type": f["type"], "id": f["id"]})
+            questions.append({
+                "question": f["label"],
+                "tag": f["tag"],
+                "type": "dropdown" if (f["role"] == "combobox" or f["popup"]) else f["type"],
+                "required": is_required(f, f["label"]),
+                "id": f["id"],
+            })
     return questions
 
 
