@@ -9,6 +9,14 @@ wheels/
 # Virtual environments
 .venv
 
+# Secrets and personal details
 .env
+profile.json
+*.pdf
 
+# Generated output files
 extract_output.txt
+form_fields.json
+jobs.json
+form_questions.json
+page.png    
