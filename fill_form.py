@@ -6,6 +6,8 @@ URL = "https://www.databricks.com/company/careers/education--training/customer-e
 with open("plan.json", encoding="utf-8") as f:
     plan = json.load(f)
 
+with open("profile.json", encoding="utf-8") as f:
+    profile = json.load(f)
 
 def find_form_frame(page, plan):
     """Return the frame (or the page) that contains the form's fields."""
@@ -37,6 +39,9 @@ with sync_playwright() as p:
         if item["type"] in ("text", "tel", "email"):
             form.locator(f'[id="{item["id"]}"]').fill(item["value"])
             print("filled:", item["question"][:40])
+        elif item["type"] == "file" and item["value"] == "@resume":
+            form.locator(f'[id="{item["id"]}"]').set_input_files(profile["resume_path"])
+            print("uploaded resume from:", profile["resume_path"])
         else:
             print("not handled yet:", item["type"], "-", item["question"][:40])
 
