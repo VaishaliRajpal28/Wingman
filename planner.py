@@ -90,10 +90,10 @@ def clean_plan(raw_plan, questions):
     for n, q in enumerate(questions):
         item = by_n.get(n)
         if not item or item.get("action") not in ("fill", "ask_human", "skip"):
-            plan.append({"question": q["question"], "id": q.get("id"), "action": "ask_human",
+            plan.append({"question": q["question"], "type": q["type"], "id": q.get("id"), "action": "ask_human",
                          "value": "", "reason": "LLM gave no valid answer"})
         else:
-            plan.append({"question": q["question"], "id": q.get("id"), "action": item["action"],
+            plan.append({"question": q["question"], "type": q["type"], "id": q.get("id"), "action": item["action"],
                          "value": item.get("value", ""), "reason": item.get("reason", "")})
     return plan
 
@@ -108,6 +108,7 @@ if __name__ == "__main__":
         if result:
             decided.append({
                 "question": q["question"],
+                "type": q["type"],
                 "id": q.get("id"),
                 "value": "",
                 "action": result[0],
@@ -128,4 +129,4 @@ if __name__ == "__main__":
         json.dump(final_plan, out, indent=2, ensure_ascii=False)
 
     for item in final_plan:
-        print(f"[{item['action']}] {item['question'][:55]} -> {item['value']}")
+        print(f"[{item['action']}] {item['question'][:200]} -> {item['value']}")
