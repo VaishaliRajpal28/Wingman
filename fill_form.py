@@ -32,18 +32,41 @@ with sync_playwright() as p:
         pass
 
     form = find_form_frame(page, plan)
-
+    
+    filled = []
+    not_handled = []
+    
     for item in plan:
         if item["action"] != "fill" or not item["id"]:
             continue
         if item["type"] in ("text", "tel", "email"):
             form.locator(f'[id="{item["id"]}"]').fill(item["value"])
-            print("filled:", item["question"][:40])
+            filled.append(item)
         elif item["type"] == "file" and item["value"] == "@resume":
             form.locator(f'[id="{item["id"]}"]').set_input_files(profile["resume_path"])
-            print("uploaded resume from:", profile["resume_path"])
+            filled.append(item)
         else:
-            print("not handled yet:", item["type"], "-", item["question"][:40])
+            not_handled.append(item)
+            
+        needs_you = [i for i in plan if i["action"] == "ask_human"]
+    left_blank = [i for i in plan if i["action"] == "skip"]
+
+    print("\n" + "=" * 60)
+    print("REVIEW - nothing has been submitted")
+    print("=" * 60)
+    print(f"\nFilled by Wingman ({len(filled)}):")
+    for i in filled:
+        print(f"  - {i['question'][:80]}")
+    print(f"\nWingman could not fill these yet ({len(not_handled)}):")
+    for i in not_handled:
+        print(f"  - {i['question'][:80]}")
+    print(f"\nFor you to answer ({len(needs_you)}):")
+    for i in needs_you:
+        print(f"  - {i['question'][:80]}  ({i['reason']})")
+    print(f"\nLeft blank on purpose ({len(left_blank)}):")
+    for i in left_blank:
+        print(f"  - {i['question'][:80]}")
+    print()
 
     input("Check the form in the browser, then press Enter here to close...")
     browser.close()
